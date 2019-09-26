@@ -1,21 +1,18 @@
 defmodule Watchexs.FileWatcher do
   @moduledoc """
-
+  File watcher is a gensever that see the change files in the
+  watched_dirs folders.
   """
-
   require Logger
 
   use GenServer
 
-  @watched_dirs ["lib/", "test/"]
+  @watched_dirs Application.get_env(:watchexs, :watch_dirs)
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [])
-  end
+  def start_link, do: GenServer.start_link(__MODULE__, [])
 
   def init(_) do
-    {:ok, watcher_pid} =
-      FileSystem.start_link(dirs: watched_dirs())
+    {:ok, watcher_pid} = FileSystem.start_link(dirs: watched_dirs())
 
     FileSystem.subscribe(watcher_pid)
 
@@ -24,12 +21,13 @@ defmodule Watchexs.FileWatcher do
 
   def handle_info({:file_event, watcher_pid, {path, _events}},
       %{watcher_pid: watcher_pid} = state) do
-    reload_or_recompile(path)
-
+    result = reload_or_recompile(path)
+    Logger.info "Reload project."
     {:noreply, state}
   end
 
-  def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
+  def handle_info({:file_event, watcher_pid, :stop},
+      %{watcher_pid: watcher_pid} = state) do
     IO.puts "File watcher stopped."
 
     {:noreply, state}
@@ -55,10 +53,8 @@ defmodule Watchexs.FileWatcher do
 
   defp reload_or_recompile(path) do
     if File.exists?(path) do
-      restore_opts = Code.compiler_options()
-
+      Code.compiler_options()
       Code.compiler_options(ignore_module_conflict: true)
-
       Code.load_file(path)
     else
       IEx.Helpers.recompile()

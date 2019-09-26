@@ -1,19 +1,17 @@
 defmodule Watchexs do
-  @moduledoc """
-
-  """
+  @moduledoc false
 
   use Application
   import Supervisor.Spec, warn: true
+
   def start(_type, _args) do
-    children =
-      [
-        worker(Watchexs.FileWatcher, [])
-      ]
-
     opts = [strategy: :one_for_one, name: Watchexs.Supervisor]
-    Supervisor.start_link(children, opts)
-
+    Supervisor.start_link(get_childrens(), opts)
   end
 
+  defp get_childrens do
+    [
+      worker(Watchexs.FileWatcher, [])
+    ]
+  end
 end
