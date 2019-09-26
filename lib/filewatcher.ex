@@ -10,7 +10,6 @@ defmodule Watchexs.FileWatcher do
   @watched_dirs ["lib/", "test/"]
 
   def start_link do
-    IO.puts "FILE WATCHER JAJAJAJA"
     GenServer.start_link(__MODULE__, [])
   end
 
@@ -26,7 +25,7 @@ defmodule Watchexs.FileWatcher do
   def handle_info({:file_event, watcher_pid, {path, _events}},
       %{watcher_pid: watcher_pid} = state) do
     reload_or_recompile(path)
-    Watchexs.Prueba.pruebita()
+
     {:noreply, state}
   end
 
