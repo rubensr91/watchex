@@ -13,7 +13,8 @@ defmodule Watchexs do
 
   defp get_childrens(true) do
     [
-      worker(Watchexs.FileWatcher, [])
+      worker(Watchexs.FileWatcher, []),
+      worker(Watchexs.GenserverTest, [])
     ]
   end
   defp get_childrens(false), do: []

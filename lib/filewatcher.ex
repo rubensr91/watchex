@@ -16,7 +16,12 @@ defmodule Watchexs.FileWatcher do
 
     FileSystem.subscribe(watcher_pid)
 
-    {:ok, %{watcher_pid: watcher_pid}}
+    state = %{
+      watcher_pid: watcher_pid,
+      path_with_errors: []
+    }
+
+    {:ok, state}
   end
 
   def handle_info({:file_event, watcher_pid, {path, _events}},
