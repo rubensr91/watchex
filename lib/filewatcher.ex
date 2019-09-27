@@ -34,7 +34,7 @@ defmodule Watchexs.FileWatcher do
   end
 
   def handle_info(data, state) do
-    IO.puts "Get unexcepted message #{inspect data}, ignore..."
+    IO.puts "#{inspect data}"
 
     {:noreply, state}
   end
@@ -53,7 +53,6 @@ defmodule Watchexs.FileWatcher do
 
   defp reload_or_recompile(path) do
     if File.exists?(path) do
-      Code.compiler_options()
       Code.compiler_options(ignore_module_conflict: true)
       Code.load_file(path)
     else
