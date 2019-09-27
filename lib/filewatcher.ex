@@ -21,7 +21,7 @@ defmodule Watchexs.FileWatcher do
 
   def handle_info({:file_event, watcher_pid, {path, _events}},
       %{watcher_pid: watcher_pid} = state) do
-    result = reload_or_recompile(path)
+    reload_or_recompile(path)
     Logger.info "Reload project."
     {:noreply, state}
   end
