@@ -21,9 +21,16 @@ defmodule Watchexs.FileWatcher do
 
   def handle_info({:file_event, watcher_pid, {path, _events}},
       %{watcher_pid: watcher_pid} = state) do
-    reload_or_recompile(path)
-    Logger.info "Reload project."
-    {:noreply, state}
+    case reload_or_recompile(path) do
+      {:error, msg} ->
+        IO.puts "ERROR :: #{inspect msg}"
+
+        {:noreply, state}
+
+      _ ->
+        Logger.info "Reload project."
+        {:noreply, state}
+    end
   end
 
   def handle_info({:file_event, watcher_pid, :stop},
@@ -53,10 +60,21 @@ defmodule Watchexs.FileWatcher do
 
   defp reload_or_recompile(path) do
     if File.exists?(path) do
-      Code.compiler_options(ignore_module_conflict: true)
-      Code.load_file(path)
+      reload(path)
     else
-      IEx.Helpers.recompile()
+      recompile()
     end
   end
+
+  defp reload(path) do
+    Code.compiler_options(ignore_module_conflict: true)
+    Code.load_file(path)
+  rescue
+    ex -> {:error, "Error message #{inspect ex}"}
+  end
+
+  defp recompile, do: IEx.Helpers.recompile()
 end
+
+# %CompileError{description: "undefined function path/0", file: "/Users/carlosnavas/watchex/lib/prueba.ex", line: 3}
+# EXCEPTION :: %Code.LoadError{file: "/Users/carlosnavas/watchex/asgdasgd/asdasdasdasd.exå", message: "could not load /Users/carlosnavas/watchex/asgdasgd/asdasdasdasd.exå"}

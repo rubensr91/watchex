@@ -31,4 +31,4 @@ use Mix.Config
 
 config :watchexs, watch_dirs: ["lib/", "test/"]
 
-config :watchexs, enabled: false
+config :watchexs, enabled: true
